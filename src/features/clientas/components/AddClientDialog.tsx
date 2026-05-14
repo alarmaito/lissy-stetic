@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { UserPlus, Camera, X } from 'lucide-react'
+import { UserPlus, Camera, X, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,8 @@ interface Props {
 }
 
 interface PhotoState {
-  before: string | null
-  after: string | null
+  before: string[]
+  after: string[]
 }
 
 const EMPTY_FORM = {
@@ -30,12 +30,14 @@ const EMPTY_FORM = {
   notes: '',
 }
 
+const EMPTY_PHOTOS: PhotoState = { before: [], after: [] }
+
 export function AddClientDialog({ open, onOpenChange }: Props) {
   const addClient = useClientsStore((s) => s.addClient)
   const addPhoto = useClientsStore((s) => s.addPhoto)
 
   const [form, setForm] = useState(EMPTY_FORM)
-  const [photos, setPhotos] = useState<PhotoState>({ before: null, after: null })
+  const [photos, setPhotos] = useState<PhotoState>(EMPTY_PHOTOS)
   const [error, setError] = useState('')
 
   const beforeRef = useRef<HTMLInputElement>(null)
@@ -43,7 +45,7 @@ export function AddClientDialog({ open, onOpenChange }: Props) {
 
   function reset() {
     setForm(EMPTY_FORM)
-    setPhotos({ before: null, after: null })
+    setPhotos(EMPTY_PHOTOS)
     setError('')
   }
 
@@ -52,14 +54,20 @@ export function AddClientDialog({ open, onOpenChange }: Props) {
     onOpenChange(open)
   }
 
-  function handleFileChange(type: 'before' | 'after', file: File | undefined) {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string
-      setPhotos((prev) => ({ ...prev, [type]: dataUrl }))
-    }
-    reader.readAsDataURL(file)
+  function handleFiles(type: 'before' | 'after', files: FileList | null) {
+    if (!files || files.length === 0) return
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        setPhotos((prev) => ({ ...prev, [type]: [...prev[type], dataUrl] }))
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  function removePhoto(type: 'before' | 'after', index: number) {
+    setPhotos((prev) => ({ ...prev, [type]: prev[type].filter((_, i) => i !== index) }))
   }
 
   function handleSubmit() {
@@ -73,8 +81,8 @@ export function AddClientDialog({ open, onOpenChange }: Props) {
       email: form.email.trim(),
       notes: form.notes.trim() || undefined,
     })
-    if (photos.before) addPhoto(id, 'before', photos.before)
-    if (photos.after) addPhoto(id, 'after', photos.after)
+    photos.before.forEach((url) => addPhoto(id, 'before', url))
+    photos.after.forEach((url) => addPhoto(id, 'after', url))
     handleClose(false)
   }
 
@@ -142,84 +150,25 @@ export function AddClientDialog({ open, onOpenChange }: Props) {
           {/* Fotos */}
           <div className="space-y-1">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Fotos
+              Fotos (puedes subir varias)
             </label>
             <div className="grid grid-cols-2 gap-3">
-              {/* Antes */}
-              <div className="space-y-1.5">
-                <p className="text-xs text-muted-foreground font-medium">Antes</p>
-                <input
-                  ref={beforeRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleFileChange('before', e.target.files?.[0])}
-                />
-                {photos.before ? (
-                  <div className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={photos.before}
-                      alt="Antes"
-                      className="w-full h-28 object-cover rounded-xl border border-border/60"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setPhotos((p) => ({ ...p, before: null }))}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/60 p-0.5 text-background hover:bg-destructive transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => beforeRef.current?.click()}
-                    className="w-full h-28 rounded-xl border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/50 hover:bg-primary/5 transition-colors"
-                  >
-                    <Camera className="h-5 w-5" />
-                    <span className="text-xs font-medium">Subir foto</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Después */}
-              <div className="space-y-1.5">
-                <p className="text-xs text-muted-foreground font-medium">Después</p>
-                <input
-                  ref={afterRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleFileChange('after', e.target.files?.[0])}
-                />
-                {photos.after ? (
-                  <div className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={photos.after}
-                      alt="Después"
-                      className="w-full h-28 object-cover rounded-xl border border-border/60"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setPhotos((p) => ({ ...p, after: null }))}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/60 p-0.5 text-background hover:bg-destructive transition-colors"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => afterRef.current?.click()}
-                    className="w-full h-28 rounded-xl border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/50 hover:bg-primary/5 transition-colors"
-                  >
-                    <Camera className="h-5 w-5" />
-                    <span className="text-xs font-medium">Subir foto</span>
-                  </button>
-                )}
-              </div>
+              <PhotoUploadColumn
+                label="Antes"
+                photos={photos.before}
+                inputRef={beforeRef}
+                onAdd={() => beforeRef.current?.click()}
+                onRemove={(i) => removePhoto('before', i)}
+                onFiles={(files) => handleFiles('before', files)}
+              />
+              <PhotoUploadColumn
+                label="Después"
+                photos={photos.after}
+                inputRef={afterRef}
+                onAdd={() => afterRef.current?.click()}
+                onRemove={(i) => removePhoto('after', i)}
+                onFiles={(files) => handleFiles('after', files)}
+              />
             </div>
           </div>
         </div>
@@ -234,5 +183,71 @@ export function AddClientDialog({ open, onOpenChange }: Props) {
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function PhotoUploadColumn({
+  label,
+  photos,
+  inputRef,
+  onAdd,
+  onRemove,
+  onFiles,
+}: {
+  label: string
+  photos: string[]
+  inputRef: React.RefObject<HTMLInputElement | null>
+  onAdd: () => void
+  onRemove: (index: number) => void
+  onFiles: (files: FileList | null) => void
+}) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-xs text-muted-foreground font-medium">{label}</p>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          onFiles(e.target.files)
+          e.target.value = ''
+        }}
+      />
+      <div className="grid grid-cols-3 gap-1.5">
+        {photos.map((url, i) => (
+          <div key={i} className="relative group aspect-square">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={url}
+              alt={`${label} ${i + 1}`}
+              className="w-full h-full object-cover rounded-lg border border-border/60"
+            />
+            <button
+              type="button"
+              onClick={() => onRemove(i)}
+              className="absolute top-0.5 right-0.5 rounded-full bg-foreground/70 p-0.5 text-background hover:bg-destructive transition-colors"
+            >
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={onAdd}
+          className="aspect-square rounded-lg border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:border-primary/50 hover:bg-primary/5 transition-colors"
+        >
+          {photos.length === 0 ? (
+            <>
+              <Camera className="h-4 w-4" />
+              <span className="text-[9px] font-medium">Subir</span>
+            </>
+          ) : (
+            <Plus className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+    </div>
   )
 }

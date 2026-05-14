@@ -126,7 +126,10 @@ export function ClientDetailView({ clientId }: Props) {
               </AvatarFallback>
             </Avatar>
             <div className="flex items-center gap-2 pb-1">
-              <Button variant="outline" className="gap-2" onClick={() => setPromoOpen(true)}>
+              <Button
+                className="gap-2 bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 text-amber-950 hover:from-amber-400 hover:via-amber-500 hover:to-amber-600 hover:text-amber-950 shadow-[0_4px_14px_rgba(217,168,40,0.45)] border-0 font-semibold"
+                onClick={() => setPromoOpen(true)}
+              >
                 <Tag className="h-4 w-4" />
                 Ofrecer promo
               </Button>

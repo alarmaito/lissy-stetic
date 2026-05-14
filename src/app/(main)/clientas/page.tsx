@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { UserPlus, Sparkles } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { ClientsTable } from '@/features/clientas/components/ClientsTable'
 import { AddClientDialog } from '@/features/clientas/components/AddClientDialog'
 import { useClientsStore } from '@/features/clientas/store/clientsStore'
@@ -26,10 +26,6 @@ export default function ClientasPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="gap-2">
-            <Sparkles className="h-4 w-4" />
-            Generar triggers
-          </Button>
           <Button className="gap-2" onClick={() => setAddOpen(true)}>
             <UserPlus className="h-4 w-4" />
             Nueva clienta

@@ -23,6 +23,7 @@ import {
 } from '@/shared/mock'
 import { getClient, getService } from '@/shared/mock'
 import { cn, formatTime } from '@/lib/utils'
+import { BookingDetailDialog } from './BookingDetailDialog'
 
 interface Props {
   bookings: Booking[]
@@ -49,7 +50,11 @@ function addDays(d: Date, days: number): Date {
 }
 
 function sameDay(a: Date, b: Date): boolean {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  )
 }
 
 export function CalendarView({ bookings }: Props) {
@@ -57,6 +62,7 @@ export function CalendarView({ bookings }: Props) {
   const [view, setView] = useState<'week' | 'month'>('week')
   const [serviceFilter, setServiceFilter] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
 
   const filteredBookings = useMemo(
     () =>
@@ -174,15 +180,35 @@ export function CalendarView({ bookings }: Props) {
       </div>
 
       {view === 'week' ? (
-        <WeekGrid weekStart={weekStart} bookings={filteredBookings} />
+        <WeekGrid
+          weekStart={weekStart}
+          bookings={filteredBookings}
+          onSelectBooking={setSelectedBooking}
+        />
       ) : (
-        <MonthGrid weekStart={weekStart} bookings={filteredBookings} />
+        <MonthGrid
+          weekStart={weekStart}
+          bookings={filteredBookings}
+          onSelectBooking={setSelectedBooking}
+        />
       )}
+
+      <BookingDetailDialog
+        booking={selectedBooking}
+        open={selectedBooking !== null}
+        onOpenChange={(o) => { if (!o) setSelectedBooking(null) }}
+      />
     </div>
   )
 }
 
-function WeekGrid({ weekStart, bookings }: { weekStart: Date; bookings: Booking[] }) {
+interface WeekGridProps {
+  weekStart: Date
+  bookings: Booking[]
+  onSelectBooking: (b: Booking) => void
+}
+
+function WeekGrid({ weekStart, bookings, onSelectBooking }: WeekGridProps) {
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
   const today = new Date()
 
@@ -221,7 +247,7 @@ function WeekGrid({ weekStart, bookings }: { weekStart: Date; bookings: Booking[
         {/* Grid horas */}
         <div className="grid grid-cols-[60px_repeat(7,1fr)]">
           {HOURS.map((h) => (
-            <Hour key={h} h={h} days={days} bookings={bookings} />
+            <Hour key={h} h={h} days={days} bookings={bookings} onSelectBooking={onSelectBooking} />
           ))}
         </div>
       </div>
@@ -229,7 +255,14 @@ function WeekGrid({ weekStart, bookings }: { weekStart: Date; bookings: Booking[
   )
 }
 
-function Hour({ h, days, bookings }: { h: number; days: Date[]; bookings: Booking[] }) {
+interface HourProps {
+  h: number
+  days: Date[]
+  bookings: Booking[]
+  onSelectBooking: (b: Booking) => void
+}
+
+function Hour({ h, days, bookings, onSelectBooking }: HourProps) {
   return (
     <>
       <div className="border-t border-border/40 px-2 py-2 text-[10px] text-muted-foreground font-medium">
@@ -255,11 +288,12 @@ function Hour({ h, days, bookings }: { h: number; days: Date[]; bookings: Bookin
               return (
                 <div
                   key={b.id}
-                  className="rounded-lg px-2 py-1.5 text-[11px] font-medium border-l-[3px] text-foreground shadow-soft"
+                  className="rounded-lg px-2 py-1.5 text-[11px] font-medium border-l-[3px] text-foreground shadow-soft cursor-pointer hover:opacity-80 transition-opacity"
                   style={{
                     background: `${SERVICE_COLORS[svc.id]}20`,
                     borderLeftColor: SERVICE_COLORS[svc.id],
                   }}
+                  onClick={(e) => { e.stopPropagation(); onSelectBooking(b) }}
                 >
                   <p className="font-semibold truncate leading-tight">{client.name.split(' ')[0]}</p>
                   <p className="text-[10px] text-muted-foreground truncate">{svc.name}</p>
@@ -274,7 +308,13 @@ function Hour({ h, days, bookings }: { h: number; days: Date[]; bookings: Bookin
   )
 }
 
-function MonthGrid({ weekStart, bookings }: { weekStart: Date; bookings: Booking[] }) {
+interface MonthGridProps {
+  weekStart: Date
+  bookings: Booking[]
+  onSelectBooking: (b: Booking) => void
+}
+
+function MonthGrid({ weekStart, bookings, onSelectBooking }: MonthGridProps) {
   const monthStart = new Date(weekStart.getFullYear(), weekStart.getMonth(), 1)
   const startOffset = (monthStart.getDay() + 6) % 7
   const daysInMonth = new Date(weekStart.getFullYear(), weekStart.getMonth() + 1, 0).getDate()
@@ -285,7 +325,10 @@ function MonthGrid({ weekStart, bookings }: { weekStart: Date; bookings: Booking
     <div className="rounded-2xl border border-border/70 bg-card shadow-soft overflow-hidden">
       <div className="grid grid-cols-7 border-b border-border/60 bg-secondary/30">
         {WEEK_DAYS.map((d) => (
-          <div key={d} className="px-2 py-2 text-center text-[11px] uppercase tracking-wide font-semibold text-muted-foreground">
+          <div
+            key={d}
+            className="px-2 py-2 text-center text-[11px] uppercase tracking-wide font-semibold text-muted-foreground"
+          >
             {d}
           </div>
         ))}
@@ -294,7 +337,12 @@ function MonthGrid({ weekStart, bookings }: { weekStart: Date; bookings: Booking
         {Array.from({ length: totalCells }).map((_, i) => {
           const dayNum = i - startOffset + 1
           if (dayNum < 1 || dayNum > daysInMonth) {
-            return <div key={i} className="min-h-[88px] border-t border-l border-border/40 bg-secondary/10" />
+            return (
+              <div
+                key={i}
+                className="min-h-[88px] border-t border-l border-border/40 bg-secondary/10"
+              />
+            )
           }
           const day = new Date(weekStart.getFullYear(), weekStart.getMonth(), dayNum)
           const isToday = sameDay(day, today)
@@ -313,11 +361,12 @@ function MonthGrid({ weekStart, bookings }: { weekStart: Date; bookings: Booking
                 return (
                   <div
                     key={b.id}
-                    className="text-[9px] rounded px-1 py-0.5 truncate font-medium"
+                    className="text-[9px] rounded px-1 py-0.5 truncate font-medium cursor-pointer hover:opacity-70 transition-opacity"
                     style={{
                       background: `${SERVICE_COLORS[svc.id]}25`,
                       color: SERVICE_COLORS[svc.id].replace(/65%|70%|72%|60%/, '40%'),
                     }}
+                    onClick={(e) => { e.stopPropagation(); onSelectBooking(b) }}
                   >
                     {formatTime(b.startsAt).replace(/\s/g, '')} {svc.name.split(' ')[0]}
                   </div>

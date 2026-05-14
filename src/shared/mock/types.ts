@@ -26,6 +26,23 @@ export interface Client {
   avatarHue: number
   joinedAt: string
   notes?: string
+  birthday?: string // 'MM-DD'
+}
+
+export type ProductCategory = 'cabello' | 'masaje' | 'manicure' | 'consumibles'
+export type ProductUnit = 'unidad' | 'litro' | 'gramo' | 'ml'
+
+export interface Product {
+  id: string
+  name: string
+  brand?: string
+  category: ProductCategory
+  currentStock: number
+  minStock: number
+  unit: ProductUnit
+  costPerUnit: number // USD
+  lastRestockAt?: string
+  supplier?: string
 }
 
 export type BookingStatus = 'confirmed' | 'pending' | 'completed' | 'cancelled'

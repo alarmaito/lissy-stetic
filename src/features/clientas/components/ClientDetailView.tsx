@@ -116,8 +116,8 @@ export function ClientDetailView({ clientId }: Props) {
       <Card className="overflow-hidden">
         <div className="h-24 bg-gradient-rose" />
         <CardContent className="pt-0">
-          <div className="flex items-end justify-between -mt-12">
-            <Avatar className="h-24 w-24 ring-4 ring-card shadow-lift shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-12">
+            <Avatar className="h-20 w-20 sm:h-24 sm:w-24 ring-4 ring-card shadow-lift shrink-0">
               <AvatarFallback
                 className="text-2xl"
                 style={{ background: `hsl(${client.avatarHue} 70% 65%)` }}
@@ -125,19 +125,19 @@ export function ClientDetailView({ clientId }: Props) {
                 {initials(client.name)}
               </AvatarFallback>
             </Avatar>
-            <div className="flex items-center gap-2 pb-1">
+            <div className="flex flex-wrap gap-2 sm:pb-1">
               <Button
-                className="gap-2 bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 text-amber-950 hover:from-amber-400 hover:via-amber-500 hover:to-amber-600 hover:text-amber-950 shadow-[0_4px_14px_rgba(217,168,40,0.45)] border-0 font-semibold"
+                className="gap-2 bg-gradient-to-br from-amber-300 via-amber-400 to-amber-500 text-amber-950 hover:from-amber-400 hover:via-amber-500 hover:to-amber-600 hover:text-amber-950 shadow-[0_4px_14px_rgba(217,168,40,0.45)] border-0 font-semibold flex-1 sm:flex-initial min-w-[140px]"
                 onClick={() => setPromoOpen(true)}
               >
                 <Tag className="h-4 w-4" />
                 Ofrecer promo
               </Button>
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2 flex-1 sm:flex-initial min-w-[100px]">
                 <Phone className="h-4 w-4" />
                 Llamar
               </Button>
-              <Button className="gap-2">
+              <Button className="gap-2 flex-1 sm:flex-initial min-w-[120px]">
                 <Calendar className="h-4 w-4" />
                 Agendar cita
               </Button>

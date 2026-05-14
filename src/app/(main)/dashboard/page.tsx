@@ -1,4 +1,5 @@
 import { CalendarCheck, DollarSign, Sparkles, Users, ArrowUpRight, Clock } from 'lucide-react'
+import { BirthdayWidget } from '@/features/dashboard/components/BirthdayWidget'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -200,39 +201,42 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-soft border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary" />
-              Insights del mes
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 -mt-2">
-            <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
-                Servicio más solicitado
-              </p>
-              <p className="font-display text-lg font-bold text-foreground mt-1">Masaje reductivo</p>
-              <p className="text-xs text-muted-foreground">12 sesiones · 6 clientas con paquete activo</p>
-            </div>
-            <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
-                Box mejor pagado
-              </p>
-              <p className="font-display text-lg font-bold text-foreground mt-1">
-                Box 1 · Manicure
-              </p>
-              <p className="text-xs text-muted-foreground">$750/mes · pagado al día</p>
-            </div>
-            <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
-                Cobros pendientes
-              </p>
-              <p className="font-display text-lg font-bold text-destructive mt-1">$1.120</p>
-              <p className="text-xs text-muted-foreground">2 boxes con pago vencido o pendiente</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-5">
+          <Card className="bg-gradient-soft border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                Insights del mes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 -mt-2">
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+                  Servicio más solicitado
+                </p>
+                <p className="font-display text-lg font-bold text-foreground mt-1">Masaje reductivo</p>
+                <p className="text-xs text-muted-foreground">12 sesiones · 6 clientas con paquete activo</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+                  Box mejor pagado
+                </p>
+                <p className="font-display text-lg font-bold text-foreground mt-1">
+                  Box 1 · Manicure
+                </p>
+                <p className="text-xs text-muted-foreground">$750/mes · pagado al día</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">
+                  Cobros pendientes
+                </p>
+                <p className="font-display text-lg font-bold text-destructive mt-1">$1.120</p>
+                <p className="text-xs text-muted-foreground">2 boxes con pago vencido o pendiente</p>
+              </div>
+            </CardContent>
+          </Card>
+          <BirthdayWidget />
+        </div>
       </div>
     </div>
   )

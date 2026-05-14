@@ -45,7 +45,7 @@ export function BeforeAfterSection({ clientId }: Props) {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-2 gap-4">
         <PhotoColumn
           label="Antes"
           photos={before}

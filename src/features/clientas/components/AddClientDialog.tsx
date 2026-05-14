@@ -152,7 +152,7 @@ export function AddClientDialog({ open, onOpenChange }: Props) {
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
               Fotos (puedes subir varias)
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid sm:grid-cols-2 gap-3">
               <PhotoUploadColumn
                 label="Antes"
                 photos={photos.before}

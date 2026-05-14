@@ -7,6 +7,7 @@ import {
   Users,
   CalendarDays,
   DoorOpen,
+  Package,
   Wallet,
   Sparkles,
   Sparkle,
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { href: '/clientas', label: 'Clientas', icon: Users },
   { href: '/calendario', label: 'Calendario', icon: CalendarDays },
   { href: '/boxes', label: 'Boxes', icon: DoorOpen },
+  { href: '/inventario', label: 'Inventario', icon: Package },
   { href: '/finanzas', label: 'Finanzas', icon: Wallet },
   { href: '/asistente-ia', label: 'Asistente IA', icon: Sparkles },
 ]
